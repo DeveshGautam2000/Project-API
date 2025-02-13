@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Insurance Premium Prediction</title>
+
+    <!-- Atropos CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/atropos@1.0.1/atropos.min.css"
+    />
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* Global Styles */
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #1f4037, #99f2c8);
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      /* Container */
+      .container {
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+      }
+
+      /* Card Styling */
+      .card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+      }
+
+      .card:hover {
+        transform: scale(1.02);
+      }
+
+      h2 {
+        margin-bottom: 25px;
+        color: #333;
+        font-size: 24px;
+      }
+
+      /* Form Styling */
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+        padding-right: 20px; /* Increased right padding */
+      }
+
+      label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+        color: #444;
+        font-size: 14px;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        transition: 0.3s;
+      }
+
+      input:focus {
+        border-color: #2ecc71;
+        outline: none;
+      }
+
+      /* Button Styling */
+      .rounded-btn {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+      }
+
+      .rounded-btn:hover {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        transform: scale(1.05);
+      }
+
+      /* Result Box */
+      .result-container {
+        margin-top: 25px;
+        position: relative;
+      }
+
+      .result {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        background: #f0f0f0;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h2>Insurance Premium Predictor</h2>
+        <form id="prediction-form" method="POST" netlify>
+          <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="Age" required />
+          </div>
+
+          <div class="form-group">
+            <label for="income">Annual Income ($):</label>
+            <input type="number" id="income" name="Annual_Income" required />
+          </div>
+
+          <div class="form-group">
+            <label for="health">Health Score (0-100):</label>
+            <input type="number" id="health" name="Health_Score" required />
+          </div>
+
+          <div class="form-group">
+            <label for="credit">Credit Score:</label>
+            <input type="number" id="credit" name="Credit_Score" required />
+          </div>
+
+          <div class="form-group">
+            <label for="duration">Insurance Duration (Years):</label>
+            <input
+              type="number"
+              id="duration"
+              name="Insurance_Duration"
+              required
+            />
+          </div>
+
+          <button type="submit" class="rounded-btn">Predict Premium</button>
+        </form>
+        <div class="result-container">
+          <div id="result" class="result">Predicted Premium: $0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("prediction-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const formData = {
+            Age: parseInt(document.getElementById("age").value),
+            Annual_Income: parseFloat(document.getElementById("income").value),
+            Health_Score: parseFloat(document.getElementById("health").value),
+            Credit_Score: parseFloat(document.getElementById("credit").value),
+            Insurance_Duration: parseFloat(
+              document.getElementById("duration").value
+            ),
+          };
+
+          try {
+            const response = await fetch(
+              "https://foolish-daveen-deveshgautam-1badc9d2.koyeb.app/predict/",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error("Server Error: " + response.status);
+            }
+
+            const data = await response.json();
+            document.getElementById(
+              "result"
+            ).innerText = `Predicted Premium: $${data.predicted_premium.toFixed(
+              2
+            )}`;
+          } catch (error) {
+            console.error("Error:", error);
+            document.getElementById("result").innerText =
+              "Error: Could not fetch prediction.";
+          }
+        });
+    </script>
+  </body>
+</html>
